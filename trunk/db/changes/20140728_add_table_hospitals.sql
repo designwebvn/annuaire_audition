@@ -1,0 +1,23 @@
+CREATE TABLE `hospitals` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `corporate_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `corporate_name_2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `link` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `additional_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `po_box` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cedex` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city_cedex` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `zip` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `city` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `country` int(11) NOT NULL,
+  `website` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fax` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `center_for_laryngectomy` int(1) DEFAULT '1',
+  `created` datetime DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci

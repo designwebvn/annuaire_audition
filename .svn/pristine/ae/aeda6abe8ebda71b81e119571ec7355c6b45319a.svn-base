@@ -1,0 +1,1 @@
+ALTER TABLE `products`     CHANGE `type` `type` INT(11) NOT NULL;

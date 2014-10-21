@@ -1,0 +1,196 @@
+<?php
+
+/**
+ * This is the model class for table "professionals".
+ *
+ * The followings are the available columns in table 'professionals':
+ * @property integer $id
+ * @property string $name
+ * @property string $first_name
+ * @property string $title
+ * @property string $email
+ * @property string $address
+ * @property string $city
+ * @property string $zip
+ * @property integer $training_center
+ * @property string $year_of_graduation
+ * @property string $additional_degree
+ * @property string $image
+ * @property string $link_professional_product
+ * @property string $link_essay
+ * @property string $created
+ * @property string $updated
+ *
+ * The followings are the available model relations:
+ * @property ProfessionalCenters[] $professionalCenters
+ * @property TrainingCenters $trainingCenter
+ *
+ */
+class Professionals extends CActiveRecord
+{
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return Professionals the static model class
+	 */
+    public $center;
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'professionals';
+	}
+    public function behaviors()
+    {
+        return array('datetimeI18NBehavior' => array('class' => 'ext.DateTimeI18NBehavior')); 
+    }
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('name, title', 'required'),
+            array('email','email'),
+			array('training_center', 'numerical', 'integerOnly'=>true),
+			array('name, first_name, address, additional_degree, link_professional_product, link_essay', 'length', 'max'=>255),
+			array('title', 'length', 'max'=>15),
+			array('email, city, zip, year_of_graduation', 'length', 'max'=>150),
+			array('image', 'length', 'max'=>155),
+			array('created, updated', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, name, first_name, title, email, address, city, zip, training_center, year_of_graduation, additional_degree, image, link_professional_product, link_essay, created, updated, center', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+            'trainingCenter' => array(self::BELONGS_TO, 'TrainingCenters', 'training_center'),
+            'professionalCenters' => array(self::HAS_MANY, 'ProfessionalCenters', 'professional_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('global', 'ID'),
+			'name' => Yii::t('global', 'Name'),
+			'first_name' => Yii::t('global', 'First Name'),
+			'title' => Yii::t('global', 'Title'),
+			'email' => Yii::t('global', 'Email'),
+			'address' => Yii::t('global', 'Address'),
+			'city' => Yii::t('global', 'City'),
+			'zip' => Yii::t('global', 'Zip'),
+			'training_center' => Yii::t('global', 'Training Center'),
+			'year_of_graduation' => Yii::t('global', 'Year Of Graduation'),
+			'additional_degree' => Yii::t('global', 'Additional Degree'),
+			'image' => Yii::t('global', 'Image'),
+			'link_professional_product' => Yii::t('global', 'Link Professional Product'),
+			'link_essay' => Yii::t('global', 'Link Essay'),
+			'created' => Yii::t('global', 'Created'),
+			'updated' => Yii::t('global', 'Updated'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+        $criteria->together = true;
+        $criteria->with     = array('trainingCenter','professionalCenters.centers');
+
+		$criteria->compare('t.id',$this->id);
+		$criteria->compare('name',$this->name,true);
+		$criteria->compare('first_name',$this->first_name,true);
+		$criteria->compare('title',$this->title,true);
+		$criteria->compare('email',$this->email,true);
+		$criteria->compare('address',$this->address,true);
+		$criteria->compare('city',$this->city,true);
+		$criteria->compare('zip',$this->zip,true);
+		$criteria->compare('training_center',$this->training_center);
+		$criteria->compare('year_of_graduation',$this->year_of_graduation,true);
+		$criteria->compare('additional_degree',$this->additional_degree,true);
+		$criteria->compare('image',$this->image,true);
+		$criteria->compare('link_professional_product',$this->link_professional_product,true);
+		$criteria->compare('link_essay',$this->link_essay,true);
+        if ($this->created)
+            $criteria->compare('t.created', date('Y-m-d ', strtotime($this->created)), true);
+		$criteria->compare('updated',$this->updated,true);
+        $criteria->compare('centers.id',$this->center);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+            'sort'=>array(
+                'defaultOrder'=>'t.id DESC',
+                'attributes'=>array(
+                    'center'=>array(
+                        'asc'=>'organizers.name',
+                        'desc'=>'organizers.name DESC',
+                    ),
+                    '*',
+                ),
+            ),
+		));
+	}
+
+    function showAdminImage(){
+        $image = ($this->image!='')?$this->image:'no_image.gif';
+        return '<a class="fancybox" href="/uploads/audios/'.$image.'" rel="group">
+					<img class="img-polaroid fix_image_products" src="/uploads/audios/'.$image.'" style="height: 40px;"/>
+				</a>';
+    }
+
+    function showAdminImageNew( $image ){
+        $image = ($image!='')?$image:'no_image.gif';
+        return '<a class="fancybox" href="/uploads/audios/'.$image.'" rel="group">
+					<img class="img-polaroid fix_image_products" src="/uploads/audios/'.$image.'" style="height: 40px;"/>
+				</a>';
+    }
+
+    public function getCategoriesId(){
+        if ($this->id){
+            $models = ProfessionalCenters::model()->findAllByAttributes(array('professional_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->centers_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getProfessionalsCenter( $id ){
+        $catEvent = ProfessionalCenters::model()->findAllByAttributes(array('professional_id' => $id));
+        $listCatProduct ="";
+        foreach($catEvent as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/centers/view/?id='.$catProduct['centers']['id']).">".$catProduct['centers']['corporate_name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+}

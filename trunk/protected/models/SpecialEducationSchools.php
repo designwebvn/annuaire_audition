@@ -1,0 +1,374 @@
+<?php
+
+/**
+ * This is the model class for table "special_education_schools".
+ *
+ * The followings are the available columns in table 'special_education_schools':
+ * @property integer $id
+ * @property string $corporate_name
+ * @property string $corporate_name_2
+ * @property integer $advertiser
+ * @property string $typology
+ * @property string $status
+ * @property string $overall_capacity
+ * @property string $management
+ * @property string $deafnesses
+ * @property string $structures
+ * @property string $language_communication
+ * @property string $support
+ * @property string $paramedical_care
+ * @property string $medical_care
+ * @property integer $specific_monitoring
+ * @property string $special_free_field
+ * @property string $cochlear_implant
+ * @property string $grades_of_teaching
+ * @property string $integration_mechanisms_1
+ * @property string $integration_mechanisms_2
+ * @property string $specialized_monitoring
+ * @property integer $fp
+ * @property string $chains
+ * @property string $branch
+ * @property string $grip
+ * @property string $description
+ * @property string $address
+ * @property string $additional_address
+ * @property string $city
+ * @property string $zip
+ * @property integer $country
+ * @property string $po_box
+ * @property string $city_cedex
+ * @property string $zip_cedex
+ * @property string $phone_1
+ * @property string $phone_2
+ * @property string $fax
+ * @property string $email_1
+ * @property string $email_2
+ * @property string $website
+ * @property string $website_2
+ * @property string $logo
+ * @property string $pics
+ * @property string $created
+ * @property string $updated
+ *
+ * The followings are the available model relations:
+ * @property SpecialEducationSchoolArticles[] $specialEducationSchoolArticles
+ * @property SpecialEducationSchoolCenters[] $specialEducationSchoolCenters
+ * @property SpecialEducationSchoolGalleries[] $specialEducationSchoolGalleries
+ * @property SpecialEducationSchoolNews[] $specialEducationSchoolNews
+ * @property SpecialEducationSchoolSpeechTherapists[] $specialEducationSchoolSpeechTherapists
+ * @property SpecialEducationSchoolStructures[] $specialEducationSchoolStructures
+
+ */
+class SpecialEducationSchools extends CActiveRecord
+{
+	const STATUS_YES = 1;
+    /**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return SpecialEducationSchools the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'special_education_schools';
+	}
+    public function behaviors()
+    {
+        return array('datetimeI18NBehavior' => array('class' => 'ext.DateTimeI18NBehavior')); 
+    }
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('corporate_name, deafnesses, grades_of_teaching, address, city, zip, country, phone_1, fax', 'required'),
+            array('email_1, email_2','email'),
+            array('phone_1, phone_2, fax', 'match', 'pattern'=>'/^([+]?[0-9 ]+)$/'),
+            array('website, website_2', 'url', 'defaultScheme' => 'http'),
+            array('advertiser, fp, specific_monitoring, country', 'numerical', 'integerOnly'=>true),
+			array('corporate_name, corporate_name_2, status, typology, overall_capacity, management, deafnesses, structures, language_communication, support, paramedical_care, special_free_field, cochlear_implant, grades_of_teaching, integration_mechanisms_1, integration_mechanisms_2, specialized_monitoring, fp, chains, branch, grip, address, additional_address, city, zip, logo, pics', 'length', 'max'=>255),
+			array('medical_care, po_box, city_cedex, zip_cedex, phone_1, phone_2, fax, email_1, email_2, website, website_2', 'length', 'max'=>150),
+			array('description, created, updated', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, corporate_name, corporate_name_2, advertiser, typology, status, overall_capacity, management, deafnesses, structures, language_communication, support, paramedical_care, medical_care, specific_monitoring, special_free_field, cochlear_implant, grades_of_teaching, integration_mechanisms_1, integration_mechanisms_2, specialized_monitoring, fp, chains, branch, grip, description, address, additional_address, city, zip, country, po_box, city_cedex, zip_cedex, phone_1, phone_2, fax, email_1, email_2, website, website_2, logo, pics, created, updated', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+            'specialEducationSchoolArticles' => array(self::HAS_MANY, 'SpecialEducationSchoolArticles', 'special_education_school_id'),
+            'specialEducationSchoolCenters' => array(self::HAS_MANY, 'SpecialEducationSchoolCenters', 'special_education_school_id'),
+            'specialEducationSchoolGalleries' => array(self::HAS_MANY, 'SpecialEducationSchoolGalleries', 'special_education_school_id'),
+            'specialEducationSchoolNews' => array(self::HAS_MANY, 'SpecialEducationSchoolNews', 'special_education_school_id'),
+            'specialEducationSchoolSpeechTherapists' => array(self::HAS_MANY, 'SpecialEducationSchoolSpeechTherapists', 'special_education_school_id'),
+            'specialEducationSchoolStructures' => array(self::HAS_MANY, 'SpecialEducationSchoolStructures', 'special_education_school_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('global', 'ID'),
+			'corporate_name' => Yii::t('global', 'Corporate Name'),
+			'corporate_name_2' => Yii::t('global', 'Corporate Name 2'),
+			'advertiser' => Yii::t('global', 'Advertiser'),
+			'typology' => Yii::t('global', 'Typology'),
+			'status' => Yii::t('global', 'Regime'),
+			'overall_capacity' => Yii::t('global', 'Overall Capacity'),
+			'management' => Yii::t('global', 'Management'),
+			'deafnesses' => Yii::t('global', 'Deafnesses'),
+			'structures' => Yii::t('global', 'Structures'),
+			'language_communication' => Yii::t('global', 'Language Communication'),
+			'support' => Yii::t('global', 'Support'),
+			'paramedical_care' => Yii::t('global', 'Paramedical Care'),
+			'medical_care' => Yii::t('global', 'Medical Care'),
+			'specific_monitoring' => Yii::t('global', 'Specific Monitoring'),
+			'special_free_field' => Yii::t('global', 'Special Free Field'),
+			'cochlear_implant' => Yii::t('global', 'Cochlear Implant'),
+			'grades_of_teaching' => Yii::t('global', 'Grades Of Teaching'),
+			'integration_mechanisms_1' => Yii::t('global', 'Integration Mechanisms 1'),
+			'integration_mechanisms_2' => Yii::t('global', 'Integration Mechanisms 2'),
+			'specialized_monitoring' => Yii::t('global', 'Specialized Monitoring'),
+			'fp' => Yii::t('global', 'Fp'),
+			'chains' => Yii::t('global', 'Chains'),
+			'branch' => Yii::t('global', 'Branch'),
+			'grip' => Yii::t('global', 'Grip'),
+			'description' => Yii::t('global', 'Description'),
+			'address' => Yii::t('global', 'Address'),
+			'additional_address' => Yii::t('global', 'Additional Address'),
+			'city' => Yii::t('global', 'City'),
+			'zip' => Yii::t('global', 'Zip'),
+			'country' => Yii::t('global', 'Country'),
+			'po_box' => Yii::t('global', 'Po Box'),
+			'city_cedex' => Yii::t('global', 'City Cedex'),
+			'zip_cedex' => Yii::t('global', 'Zip Cedex'),
+			'phone_1' => Yii::t('global', 'Phone 1'),
+			'phone_2' => Yii::t('global', 'Phone 2'),
+			'fax' => Yii::t('global', 'Fax'),
+			'email_1' => Yii::t('global', 'Email 1'),
+			'email_2' => Yii::t('global', 'Email 2'),
+			'website' => Yii::t('global', 'Website'),
+			'website_2' => Yii::t('global', 'Website 2'),
+			'logo' => Yii::t('global', 'Logo'),
+			'pics' => Yii::t('global', 'Pics'),
+			'created' => Yii::t('global', 'Created'),
+			'updated' => Yii::t('global', 'Updated'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('corporate_name',$this->corporate_name,true);
+		$criteria->compare('corporate_name_2',$this->corporate_name_2,true);
+		$criteria->compare('advertiser',$this->advertiser);
+		$criteria->compare('typology',$this->typology,true);
+		$criteria->compare('status',$this->status,true);
+		$criteria->compare('overall_capacity',$this->overall_capacity,true);
+		$criteria->compare('management',$this->management,true);
+		$criteria->compare('deafnesses',$this->deafnesses,true);
+		$criteria->compare('structures',$this->structures,true);
+		$criteria->compare('language_communication',$this->language_communication,true);
+		$criteria->compare('support',$this->support,true);
+		$criteria->compare('paramedical_care',$this->paramedical_care,true);
+		$criteria->compare('medical_care',$this->medical_care,true);
+		$criteria->compare('specific_monitoring',$this->specific_monitoring);
+		$criteria->compare('special_free_field',$this->special_free_field,true);
+		$criteria->compare('cochlear_implant',$this->cochlear_implant,true);
+		$criteria->compare('grades_of_teaching',$this->grades_of_teaching,true);
+		$criteria->compare('integration_mechanisms_1',$this->integration_mechanisms_1,true);
+		$criteria->compare('integration_mechanisms_2',$this->integration_mechanisms_2,true);
+		$criteria->compare('specialized_monitoring',$this->specialized_monitoring,true);
+		$criteria->compare('fp',$this->fp);
+		$criteria->compare('chains',$this->chains,true);
+		$criteria->compare('branch',$this->branch,true);
+		$criteria->compare('grip',$this->grip,true);
+		$criteria->compare('description',$this->description,true);
+		$criteria->compare('address',$this->address,true);
+		$criteria->compare('additional_address',$this->additional_address,true);
+		$criteria->compare('city',$this->city,true);
+		$criteria->compare('zip',$this->zip,true);
+		$criteria->compare('country',$this->country);
+		$criteria->compare('po_box',$this->po_box,true);
+		$criteria->compare('city_cedex',$this->city_cedex,true);
+		$criteria->compare('zip_cedex',$this->zip_cedex,true);
+		$criteria->compare('phone_1',$this->phone_1,true);
+		$criteria->compare('phone_2',$this->phone_2,true);
+		$criteria->compare('fax',$this->fax,true);
+		$criteria->compare('email_1',$this->email_1,true);
+		$criteria->compare('email_2',$this->email_2,true);
+		$criteria->compare('website',$this->website,true);
+		$criteria->compare('website_2',$this->website_2,true);
+		$criteria->compare('logo',$this->logo,true);
+		$criteria->compare('pics',$this->pics,true);
+		$criteria->compare('created',$this->created,true);
+		$criteria->compare('updated',$this->updated,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+            'sort'=>array(
+                'defaultOrder'=>'t.id DESC',
+            ),
+		));
+	}
+
+    public function getStatus( $status ){
+        $name = Yii::t('global','No');
+        if( $status == self::STATUS_YES )
+            $name = Yii::t('global','Yes');
+        return $name;
+    }
+
+    function showAdminImageNew( $image ){
+        $image = ($image != '')?$image:'no_image.gif';
+        return '<a class="fancybox" href="/uploads/special_education_school/'.$image.'" rel="group">
+					<img class="img-polaroid fix_image_products" src="/uploads/special_education_school/'.$image.'" style="height: 40px;"/>
+				</a>';
+    }
+
+    function getTree( &$arr ){
+        $models=self::model()->findAll(array(
+            'order'=>'corporate_name',
+        ));
+        foreach($models as $model){
+            $arr[$model->id]['corporate_name']=$model->corporate_name;
+        }
+    }
+
+    public function getSpecialEducationSchoolNewsId(){
+        if ($this->id){
+            $models = SpecialEducationSchoolNews::model()->findAllByAttributes(array('special_education_school_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->news_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getSpecialEducationSchoolNews( $id ){
+        $catProducts = SpecialEducationSchoolNews::model()->findAllByAttributes(array('special_education_school_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/news/view?id='.$catProduct['news']['id']).">".$catProduct['news']['title']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    public function getSpecialEducationSchoolArticlesId(){
+        if ($this->id){
+            $models = SpecialEducationSchoolArticles::model()->findAllByAttributes(array('special_education_school_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->product_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getSpecialEducationSchoolArticles( $id ){
+        $catProducts = SpecialEducationSchoolArticles::model()->findAllByAttributes(array('special_education_school_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/articles/view?id='.$catProduct['product']['id']).">".$catProduct['product']['name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    public function getSpecialEducationSchoolCenterId(){
+        if ($this->id){
+            $models = SpecialEducationSchoolCenters::model()->findAllByAttributes(array('special_education_school_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->center_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getSpecialEducationSchoolCenter( $id ){
+        $catProducts = SpecialEducationSchoolCenters::model()->findAllByAttributes(array('special_education_school_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/centers/view?id='.$catProduct['center']['id']).">".$catProduct['center']['corporate_name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    public function getSpecialEducationSchoolSpeechTherapistId(){
+        if ($this->id){
+            $models = SpecialEducationSchoolSpeechTherapists::model()->findAllByAttributes(array('special_education_school_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->speech_therapist_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getSpecialEducationSchoolSpeechTherapist( $id ){
+        $catProducts = SpecialEducationSchoolSpeechTherapists::model()->findAllByAttributes(array('special_education_school_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/speechTherapist/view?id='.$catProduct['speechTherapist']['id']).">".$catProduct['speechTherapist']['name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    public function getSpecialEducationSchoolStructuresId(){
+        if ($this->id){
+            $models = SpecialEducationSchoolStructures::model()->findAllByAttributes(array('special_education_school_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->structure_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+    function getSpecialEducationSchoolStructures( $id ){
+        $catProducts = SpecialEducationSchoolStructures::model()->findAllByAttributes(array('special_education_school_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/structureSes/view?id='.$catProduct['structure']['id']).">".$catProduct['structure']['name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+
+}

@@ -1,0 +1,48 @@
+<div class="cmnt-reply-form float-width">
+		<h3 class="sec-title"><?php echo Yii::t('global','LEAVE A RESPONSE'); ?></h3>
+		<?php 
+		$form=$this->beginWidget('CActiveForm', array(
+			'id'=>'comment-form',
+			'htmlOptions'=>array('role'=>'form','data-validate'=>'parsley'),
+			'enableAjaxValidation'=>true,
+
+		)); ?>
+			
+			<p class="note"><?php echo Yii::t('global','Fields are required'); ?>.</p>
+
+			<div class="form-group">
+				<?php //echo $form->labelEx($model,'author'); ?>
+				<?php echo $form->textField($model,'author',array('size'=>60,'maxlength'=>128, 'class'=>'form-control', 'placeholder'=>Yii::t('global','Author'),'data-validation-minlength'=>'0','data-trigger'=>'change','data-required'=>'true')); ?>
+				<?php echo $form->error($model,'author'); ?>
+			</div>
+
+			<div class="form-group">
+				<?php // echo $form->labelEx($model,'subject'); ?>
+				<?php echo $form->textField($model,'subject',array('size'=>60,'maxlength'=>128, 'class'=>'form-control', 'placeholder'=>Yii::t('global','Subject'),'data-validation-minlength'=>'0','data-trigger'=>'change','data-required'=>'true')); ?>
+				<?php echo $form->error($model,'subject'); ?>
+			</div>
+
+			<div class="form-group">
+				<?php //echo $form->labelEx($model,'content'); ?>
+				<?php echo $form->textArea($model,'content',array('rows'=>6, 'cols'=>50, 'class'=>'form-control', 'placeholder'=>Yii::t('global','Content'),'data-validation-minlength'=>'0','data-trigger'=>'change','data-required'=>'true')); ?>
+				<?php echo $form->error($model,'content'); ?>
+			</div>
+
+			<?php if(CCaptcha::checkRequirements()): ?>
+			<div class="form-group">
+				<?php //echo $form->labelEx($model,'verifyCode'); ?>
+				<div class="block-capcha">
+					<?php $this->widget('CCaptcha'); ?>
+					<?php echo $form->textField($model,'verifyCode',array('size'=>60,'maxlength'=>12, 'class'=>'form-control','data-validation-minlength'=>'0','data-trigger'=>'change','data-required'=>'true')); ?>
+				</div>
+				<?php echo $form->error($model,'verifyCode'); ?>
+			</div>
+			<?php endif; ?>
+
+			<div class="form-group">
+				<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('global','POST YOUR COMMENT') : Yii::t('global', 'Save')); ?>
+			</div>
+
+		<?php $this->endWidget(); ?>
+
+ </div>

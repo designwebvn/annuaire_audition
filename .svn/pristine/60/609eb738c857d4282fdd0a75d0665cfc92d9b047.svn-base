@@ -1,0 +1,271 @@
+<?php
+
+/**
+ * This is the model class for table "events".
+ *
+ * The followings are the available columns in table 'events':
+ * @property integer $id
+ * @property string $name
+ * @property string $location
+ * @property integer $type_events
+ * @property integer $organizer_id
+ * @property string $address
+ * @property string $city
+ * @property string $zip
+ * @property string $starting_date
+ * @property string $ending_date
+ * @property string $logo
+ * @property string $description
+ * @property string $website1
+ * @property string $website2
+ * @property string $pdf
+ * @property integer $is_highlight
+ * @property string $created
+ * @property string $updated
+ *
+ * The followings are the available model relations:
+ * @property EventOrganizers[] $eventOrganizers
+ */
+class Events extends CActiveRecord
+{
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return Events the static model class
+	 */
+    const STATUS_ACTIVE                 = 1;
+    public $organizers;
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'events';
+	}
+    public function behaviors()
+    {
+        return array('datetimeI18NBehavior' => array('class' => 'ext.DateTimeI18NBehavior')); 
+    }
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('name, location, type_events, starting_date, ending_date, description', 'required'),
+            array('website1, website2', 'url', 'defaultScheme' => 'http'),
+			array('type_events, organizer_id, is_highlight', 'numerical', 'integerOnly'=>true),
+			array('name, location, address, logo, website1, website2, pdf', 'length', 'max'=>255),
+			array('city, zip', 'length', 'max'=>100),
+			array('created, updated', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, name, location, type_events, organizer_id, address, city, zip, starting_date, ending_date, logo, description, website1, website2, pdf, is_highlight, created, updated, organizers', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+            'eventOrganizers' => array(self::HAS_MANY, 'EventOrganizers', 'event_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('global', 'ID'),
+			'name' => Yii::t('global', 'Name'),
+			'location' => Yii::t('global', 'Location'),
+			'type_events' => Yii::t('global', 'Type of Event'),
+			'organizer_id' => Yii::t('global', 'Organizer'),
+			'address' => Yii::t('global', 'Address'),
+			'city' => Yii::t('global', 'City'),
+			'zip' => Yii::t('global', 'Zip'),
+			'starting_date' => Yii::t('global', 'Starting Date'),
+			'ending_date' => Yii::t('global', 'Ending Date'),
+			'logo' => Yii::t('global', 'Logo'),
+			'description' => Yii::t('global', 'Description'),
+			'website1' => Yii::t('global', 'Website1'),
+			'website2' => Yii::t('global', 'Website2'),
+			'pdf' => Yii::t('global', 'Pdf'),
+			'is_highlight' => Yii::t('global', 'Disable in home ?'),
+			'created' => Yii::t('global', 'Created'),
+			'updated' => Yii::t('global', 'Updated'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+        $criteria->together = true;
+        $criteria->with = array('eventOrganizers.organizers');
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('name',$this->name,true);
+		$criteria->compare('location',$this->location,true);
+		$criteria->compare('type_events',$this->type_events);
+		$criteria->compare('organizer_id',$this->organizer_id);
+		$criteria->compare('address',$this->address,true);
+		$criteria->compare('city',$this->city,true);
+		$criteria->compare('zip',$this->zip,true);
+        if ($this->starting_date)
+            $criteria->compare('t.starting_date', date('Y-m-d ', strtotime($this->starting_date)), true);
+        if ($this->ending_date)
+            $criteria->compare('t.ending_date', date('Y-m-d ', strtotime($this->ending_date)), true);
+		$criteria->compare('logo',$this->logo,true);
+		$criteria->compare('description',$this->description,true);
+		$criteria->compare('website1',$this->website1,true);
+		$criteria->compare('website2',$this->website2,true);
+		$criteria->compare('pdf',$this->pdf,true);
+		$criteria->compare('is_highlight',$this->is_highlight);
+		$criteria->compare('created',$this->created,true);
+		$criteria->compare('updated',$this->updated,true);
+        $criteria->compare('organizers.id',$this->organizers);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+            'sort'=>array(
+                'defaultOrder'=>'t.id DESC',
+                'attributes'=>array(
+                    'organizers'=>array(
+                        'asc'=>'organizers.name',
+                        'desc'=>'organizers.name DESC',
+                    ),
+                    '*',
+                ),
+            ),
+		));
+	}
+
+    function getStatusEvents( $highlight ){
+        if($highlight == self::STATUS_ACTIVE)
+            return Yii::t('global','Active');
+        return Yii::t('global','Inactive');
+    }
+
+    function showAdminImageNew( $image ){
+        return '<a class="fancybox" href="/uploads/events/'.$image.'" rel="group">
+					<img class="img-polaroid fix_image_products" src="/uploads/events/'.$image.'" style="height: 40px;"/>
+				</a>';
+    }
+
+    function getEventsCategory( $id, $option = 0 ){
+        $catNews = EventsCategory::model()->findAllByAttributes(array('id' => $id));
+        $listCatNews ="";
+        foreach($catNews as $catNewsa){
+            if( $option == 1 )
+                $listCatNews .= $catNewsa['name'];
+            else
+                $listCatNews .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/eventsCategory/view/?id='.$catNewsa['id']).">".$catNewsa['name']."</a></label>";
+        }
+        return $listCatNews;
+    }
+
+    function getOrganizer( $id, $option = 0 ){
+        $catNews = Organizers::model()->findAllByAttributes(array('id' => $id));
+        $listCatNews ="";
+        foreach($catNews as $catNewsa){
+            if( $option == 1 )
+                $listCatNews .= $catNewsa['name'];
+            else
+                $listCatNews .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/organizers/view/?id='.$catNewsa['id']).">".$catNewsa['name']."</a></label>";
+        }
+        return $listCatNews;
+    }
+
+    function getEventOrganizer( $id ){
+        $catEvent = EventOrganizers::model()->findAllByAttributes(array('event_id' => $id));
+        $listCatProduct ="";
+        foreach($catEvent as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/organizers/view/?id='.$catProduct['organizers']['id']).">".$catProduct['organizers']['name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    function getActiveEvents(){
+        $active_news = array(
+            Yii::t('global','InActive'),
+            Yii::t('global','Active')
+        );
+        return $active_news;
+    }
+
+	function getNewEvents(){
+		return Events::model()->findAll(array('order'=>'created DESC','limit'=> 5));
+	}
+
+	function renBlockNewEvents(){
+		$blockRents = $this->getNewEvents();
+		if($blockRents and (count($blockRents) >=5)){
+			foreach ($blockRents as $key => $blockRent) {
+				$date = new DateTime($blockRent["created"]);
+				$date = $date->format('d M Y');
+				$image 	= $blockRent["logo"];
+				if($image == '')  $image = 'noimage.png';
+
+				if($key == 0){
+					$content = Utils::short_description(strip_tags($blockRent["description"]),320);
+					$html ='<div class="sec-1-big float-width">
+								<a class="img" href="/event/'.$blockRent["id"].'-'.Yii::app()->func->makeAlias( $blockRent["name"] ).'"><img alt="" class="blocky" src="/uploads/events/'.$image.'" /></a>
+								<div class="sec-1-big-text lefty">
+									<h3><a href="/event/'.$blockRent["id"].'-'.Yii::app()->func->makeAlias( $blockRent["name"] ).'">'.$blockRent["name"].'</a></h3>
+									<h6><span><i class="fa fa-clock-o"></i>'.$date.'</span></h6>
+									<p>'.$content.'</p>
+								</div>
+							</div>';
+				}
+				else{
+					$content = Utils::short_description(strip_tags($blockRent["description"]),80);
+					$html .= '<div class="sec-1-sm">
+								<a href="/event/'.$blockRent["id"].'" class="img" ><img alt="" class="blocky" src="/uploads/events/'.$image.'" /></a>
+								<div class="sec-1-sm-text blocky">
+									<h3><a href="/event/'.$blockRent["id"].'-'.Yii::app()->func->makeAlias( $blockRent["name"] ).'">'.$blockRent["name"].'</a></h3>
+									<h6><span><i class="fa fa-clock-o"></i>'.$date.'</span></h6>
+									<p>'.$content.'</p>
+								</div>
+							</div>';
+				}
+			}
+			return $html;
+		}
+		else
+			return null;
+	}
+
+    public function getCategoriesId(){
+        if ($this->id){
+            $models = EventOrganizers::model()->findAllByAttributes(array('event_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->organizers_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+}

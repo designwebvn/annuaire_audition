@@ -1,0 +1,1 @@
+ALTER TABLE `chips`     ADD COLUMN `image` VARCHAR(255) NULL AFTER `name`;

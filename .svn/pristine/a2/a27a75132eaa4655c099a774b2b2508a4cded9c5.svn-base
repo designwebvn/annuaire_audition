@@ -1,0 +1,154 @@
+<?php
+
+/**
+ * This is the model class for table "newspapers_titles".
+ *
+ * The followings are the available columns in table 'newspapers_titles':
+ * @property integer $id
+ * @property integer $press_id
+ * @property string $title
+ * @property string $theme
+ * @property string $periodicity
+ * @property string $created
+ * @property string $updated
+ *
+ * The followings are the available model relations:
+ * @property Press $press
+ */
+class NewspapersTitles extends CActiveRecord
+{
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return NewspapersTitles the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'newspapers_titles';
+	}
+    public function behaviors()
+    {
+        return array('datetimeI18NBehavior' => array('class' => 'ext.DateTimeI18NBehavior')); 
+    }
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('press_id, title', 'required'),
+			array('press_id', 'numerical', 'integerOnly'=>true),
+			array('title, theme, periodicity', 'length', 'max'=>255),
+			array('created, updated', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, press_id, title, theme, periodicity, created, updated', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'press' => array(self::BELONGS_TO, 'Press', 'press_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('global', 'ID'),
+			'press_id' => Yii::t('global', 'Press'),
+			'title' => Yii::t('global', 'Title'),
+			'theme' => Yii::t('global', 'Theme'),
+			'periodicity' => Yii::t('global', 'Periodicity'),
+			'created' => Yii::t('global', 'Created'),
+			'updated' => Yii::t('global', 'Updated'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('press_id',$this->press_id);
+		$criteria->compare('title',$this->title,true);
+		$criteria->compare('theme',$this->theme,true);
+		$criteria->compare('periodicity',$this->periodicity,true);
+		$criteria->compare('created',$this->created,true);
+		$criteria->compare('updated',$this->updated,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+    public function saveNewspapers( $newspapers, $id ){
+        foreach( $newspapers as $newspaper ){
+            if( $newspaper['nameTitle'] != '' ){
+                $model              = new NewspapersTitles();
+                $model->press_id    = $id;
+                $model->title       = $newspaper['nameTitle'];
+                $model->theme       = $newspaper['themeTitle'];
+                $model->periodicity = $newspaper['periodicityTitle'];
+                $model->save();
+            }
+        }
+    }
+
+    public function getAllNewspaper(){
+        $allCategory = self::model()->findAll();
+        $category = array();
+        foreach($allCategory as $item) {
+            $category[$item['id']]=$item['title'];
+        }
+        return $category;
+    }
+
+    public function updateNewspaperTitles($groups, $product_id){
+        $Allgroup = NewspapersTitles::model()->findAllByAttributes(array('press_id'=>$product_id));
+        foreach($Allgroup as $item ){
+
+            if (array_key_exists($item->id, $groups)) {
+                $model = NewspapersTitles::model()->findByPk($item->id);
+                $model->title       = $groups[$item->id]['nameTitle'];
+                $model->theme       = $groups[$item->id]['themeTitle'];
+                $model->periodicity = $groups[$item->id]['periodicityTitle'];
+                $model->save();
+                unset($groups[$item->id]);
+            } else {
+                NewspapersTitles::model()->findByPk($item->id)->delete();
+            }
+        }
+        if(is_array($groups) && count($groups) >0 ){
+            self::saveNewspapers($groups,$product_id);
+        }
+    }
+
+}

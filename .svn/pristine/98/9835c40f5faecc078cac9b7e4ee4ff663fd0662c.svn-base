@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * This is the model class for table "speech_therapist".
+ *
+ * The followings are the available columns in table 'speech_therapist':
+ * @property integer $id
+ * @property string $title
+ * @property string $name
+ * @property string $firstname
+ * @property string $degrees
+ * @property string $status_grade
+ * @property integer $specialty_hospitals
+ * @property string $free_link
+ * @property integer $advertisers
+ * @property string $specialty_if_advertisers
+ * @property string $specialty
+ * @property string $phone_1
+ * @property string $phone_2
+ * @property string $fax
+ * @property string $email_1
+ * @property string $email_2
+ * @property string $website
+ * @property string $created
+ * @property string $updated
+ * @property integer $department
+ *
+ * The followings are the available model relations:
+ * @property SpeechTherapistHospitals[] $speechTherapistHospitals
+ * @property SpeechTherapistPractices[] $speechTherapistPractices
+ * @property Maps $department0
+ */
+class SpeechTherapist extends CActiveRecord
+{
+	const STATUS_YES = 1;
+    /**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return SpeechTherapist the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'speech_therapist';
+	}
+    public function behaviors()
+    {
+        return array('datetimeI18NBehavior' => array('class' => 'ext.DateTimeI18NBehavior')); 
+    }
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('title, name, firstname', 'required'),
+            array('email_1, email_2','email'),
+            array('phone_1, phone_2, fax', 'match', 'pattern'=>'/^([+]?[0-9 ]+)$/'),
+            array('website', 'url', 'defaultScheme' => 'http'),
+			array('specialty_hospitals, advertisers, department', 'numerical', 'integerOnly'=>true),
+			array('title, name, firstname, status_grade, free_link, specialty_if_advertisers, specialty, phone_1, phone_2, fax, email_1, email_2, website', 'length', 'max'=>255),
+			array('degrees, created, updated', 'safe'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('id, title, name, firstname, degrees, status_grade, specialty_hospitals, free_link, advertisers, specialty_if_advertisers, specialty, phone_1, phone_2, fax, email_1, email_2, website, created, updated, department', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'speechTherapistHospitals' => array(self::HAS_MANY, 'SpeechTherapistHospitals', 'speech_therapist_id'),
+			'speechTherapistPractices' => array(self::HAS_MANY, 'SpeechTherapistPractices', 'speech_therapist_id'),
+            'department0' => array(self::BELONGS_TO, 'Maps', 'department'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id' => Yii::t('global', 'ID'),
+			'title' => Yii::t('global', 'Civility'),
+			'name' => Yii::t('global', 'Name'),
+			'firstname' => Yii::t('global', 'First Name'),
+			'degrees' => Yii::t('global', 'Degrees'),
+            'status_grade' => Yii::t('global', 'Status Grade'),
+            'specialty_hospitals' => Yii::t('global', 'Specialty Hospitals'),
+            'free_link' => Yii::t('global', 'Free Field'),
+			'advertisers' => Yii::t('global', 'Advertisers'),
+			'specialty_if_advertisers' => Yii::t('global', 'Specialty If Advertisers'),
+			'specialty' => Yii::t('global', 'Specialty'),
+			'phone_1' => Yii::t('global', 'Phone 1'),
+			'phone_2' => Yii::t('global', 'Phone 2'),
+			'fax' => Yii::t('global', 'Fax'),
+			'email_1' => Yii::t('global', 'Email 1'),
+			'email_2' => Yii::t('global', 'Email 2'),
+			'website' => Yii::t('global', 'Website'),
+			'created' => Yii::t('global', 'Created'),
+			'updated' => Yii::t('global', 'Updated'),
+            'department' => Yii::t('global', 'Department'),
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id',$this->id);
+		$criteria->compare('title',$this->title,true);
+		$criteria->compare('name',$this->name,true);
+		$criteria->compare('firstname',$this->firstname,true);
+		$criteria->compare('degrees',$this->degrees,true);
+        $criteria->compare('status_grade',$this->status_grade,true);
+        $criteria->compare('specialty_hospitals',$this->specialty_hospitals);
+        $criteria->compare('free_link',$this->free_link,true);
+		$criteria->compare('advertisers',$this->advertisers);
+		$criteria->compare('specialty_if_advertisers',$this->specialty_if_advertisers,true);
+		$criteria->compare('specialty',$this->specialty,true);
+		$criteria->compare('phone_1',$this->phone_1,true);
+		$criteria->compare('phone_2',$this->phone_2,true);
+		$criteria->compare('fax',$this->fax,true);
+		$criteria->compare('email_1',$this->email_1,true);
+		$criteria->compare('email_2',$this->email_2,true);
+		$criteria->compare('website',$this->website,true);
+        if ($this->created)
+            $criteria->compare('t.created', date('Y-m-d ', strtotime($this->created)), true);
+		$criteria->compare('updated',$this->updated,true);
+        $criteria->compare('department',$this->department);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+    public function getStatus( $status ){
+        $name = Yii::t('global','No');
+        if( $status == self::STATUS_YES )
+            $name = Yii::t('global','Yes');
+        return $name;
+    }
+
+    function getSpeechTherapistPractice( $id ){
+        $catProducts = SpeechTherapistPractices::model()->findAllByAttributes(array('speech_therapist_id' => $id));
+        $listCatProduct ="";
+        foreach($catProducts as $catProduct){
+            $listCatProduct .= "<label class='catProduct'> <a href=".Yii::app()->createUrl('admin/practices/view?id='.$catProduct['practices']['id']).">".$catProduct['practices']['name']."</a></label>";
+        }
+        return $listCatProduct;
+    }
+
+    public function getCategoriesId(){
+        if ($this->id){
+            $models = SpeechTherapistPractices::model()->findAllByAttributes(array('speech_therapist_id' => $this->id));
+            $arr = array();
+            foreach ($models as $model)
+                $arr[] = $model->practices_id;
+
+            return $arr;
+        }
+        return array();
+    }
+
+}
